@@ -11,11 +11,13 @@ RUN tar -zxvf  /app/geth.tar.gz -C /app/ --strip-components=1
 RUN cd /app/ && make 
 
 FROM alpine:latest
-RUN apk add --no-cache ca-certificates
+RUN apk add --no-cache ca-certificates sudo
 COPY --from=build /app/build/bin/geth /usr/bin/geth
 RUN adduser geth -h /data -u 1001 -g 'ethereum node' -S 
+COPY entrypoint.sh /usr/bin/entrypoint.sh
+RUN chmod +x /usr/bin/entrypoint.sh
 
 EXPOSE 8545 8546 30303 30303/udp
-USER geth
 
-ENTRYPOINT ["geth"]
+
+ENTRYPOINT ["/usr/bin/entrypoint.sh"]
